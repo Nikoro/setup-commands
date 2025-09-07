@@ -1,0 +1,14 @@
+name: 'Setup and Run Commands CLI'
+description: 'Prepends Dart pub-cache to PATH and activates + runs commands CLI'
+runs:
+  using: 'composite'
+  steps:
+    - name: Prepend dart pub-cache bin to PATH
+      shell: bash
+      run: echo "$HOME/.pub-cache/bin:$HOME/.pub-cache/bin:$PATH" >> $GITHUB_PATH
+
+    - name: Activate and run commands CLI
+      shell: bash
+      run: |
+        dart pub global activate --source git https://github.com/Nikoro/commands.git
+        dart pub global run commands

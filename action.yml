@@ -1,14 +1,25 @@
-name: 'Setup and Run Commands CLI'
-description: 'Prepends Dart pub-cache to PATH and activates + runs commands CLI'
+name: 'Setup Commands CLI'
+description: 'Prepends Dart pub-cache to PATH and activates commands CLI'
+inputs:
+  ref:
+    description: 'Git reference (tag, branch, or commit hash) of commands to activate from GitHub. Leave empty to install latest from pub.dev.'
+    required: false
+    default: ''
 runs:
   using: 'composite'
   steps:
     - name: Prepend dart pub-cache bin to PATH
       shell: bash
-      run: echo "$HOME/.pub-cache/bin:$HOME/.pub-cache/bin:$PATH" >> $GITHUB_PATH
+      run: echo "$HOME/.pub-cache/bin:$PATH" >> $GITHUB_PATH
 
-    - name: Activate and run commands CLI
+    - name: Activate commands CLI
       shell: bash
       run: |
-        dart pub global activate --source git https://github.com/Nikoro/commands.git
-        dart pub global run commands
+        REF="${{ inputs.ref }}"
+        if [ -z "$REF" ]; then
+          echo "Installing latest version from pub.dev..."
+          dart pub global activate commands_cli
+        else
+          echo "Installing from GitHub ref: $REF"
+          dart pub global activate --source git https://github.com/Nikoro/commands_cli.git --git-ref $REF
+        fi
